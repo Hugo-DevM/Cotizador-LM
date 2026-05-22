@@ -36,9 +36,12 @@ export function QuoteTemplate({ data }: QuoteTemplateProps) {
           <tr>
             <td className={`${cell} w-[60%] align-top p-2`}>
               <div className="flex items-start gap-3">
-                <div className="w-20 h-20 border-2 border-dashed border-gray-400 rounded flex items-center justify-center flex-shrink-0 bg-gray-50">
-                  <span className="text-[9px] text-gray-400 text-center leading-tight">LOGO</span>
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logolm.jpeg"
+                  alt="Logo Laptops Master"
+                  className="w-20 h-20 object-contain flex-shrink-0"
+                />
                 <div className="flex-1 pt-1">
                   <p className="text-sm font-bold text-red-700 mb-1">{COMPANY.name}</p>
                   <p className="text-gray-500">{COMPANY.address}</p>

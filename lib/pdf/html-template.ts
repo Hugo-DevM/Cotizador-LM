@@ -1,8 +1,23 @@
+import fs from 'fs'
+import path from 'path'
 import { COMPANY, TERMS } from '@/lib/constants/company'
 import { formatDateMX } from '@/lib/utils/date'
 import { formatMXN } from '@/lib/utils/currency'
 import { calculateTotals } from '@/lib/calculations/totals'
 import type { QuoteSchemaInput } from '@/lib/schemas/quote'
+
+let _logoDataUrl: string | null = null
+function getLogoDataUrl(): string {
+  if (_logoDataUrl === null) {
+    try {
+      const data = fs.readFileSync(path.join(process.cwd(), 'public', 'logolm.jpeg'))
+      _logoDataUrl = `data:image/jpeg;base64,${data.toString('base64')}`
+    } catch {
+      _logoDataUrl = ''
+    }
+  }
+  return _logoDataUrl
+}
 
 const C = {
   red: '#c00000',
@@ -26,6 +41,7 @@ const label = `${cellR} background:${C.labelBg}; font-weight:600;`
 const TOTAL_ROWS = 17
 
 export function buildQuoteHTML(data: QuoteSchemaInput): string {
+  const logoDataUrl = getLogoDataUrl()
   const totals = calculateTotals(data.items, data.discount, data.shipping)
 
   const visibleItems = data.items.filter(
@@ -76,9 +92,10 @@ export function buildQuoteHTML(data: QuoteSchemaInput): string {
       <table style="border-collapse:collapse;width:100%;">
         <tr>
           <td style="width:90px;vertical-align:top;padding-right:10px;">
-            <div style="width:85px;height:85px;border:2px dashed #aaa;border-radius:4px;display:flex;align-items:center;justify-content:center;background:#f9f9f9;">
-              <span style="font-size:8pt;color:#aaa;text-align:center;line-height:1.3;">LOGO</span>
-            </div>
+            ${logoDataUrl
+              ? `<img src="${logoDataUrl}" alt="Logo" style="width:85px;height:85px;object-fit:contain;display:block;"/>`
+              : `<div style="width:85px;height:85px;border:2px dashed #aaa;border-radius:4px;background:#f9f9f9;"></div>`
+            }
           </td>
           <td style="vertical-align:middle;">
             <div style="font-weight:700;font-size:13pt;margin-bottom:3px;color:${C.red};">${COMPANY.name}</div>
