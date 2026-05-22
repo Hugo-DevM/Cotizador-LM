@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
-import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { QuoteSchema } from "@/lib/schemas/quote";
 import type { QuoteFormValues } from "@/types/quote";
@@ -28,24 +28,22 @@ const SECTION_TITLE =
 interface ItemRowProps {
   index: number;
   fieldId: string;
-  control: Control<QuoteFormValues>;
   register: UseFormRegister<QuoteFormValues>;
   errors: FieldErrors<QuoteFormValues>;
   remove: (index: number) => void;
   isOnly: boolean;
+  lineTotal: number;
 }
 
 function ItemRow({
   index,
   fieldId,
-  control,
   register,
   errors,
   remove,
   isOnly,
+  lineTotal,
 }: ItemRowProps) {
-  const item = useWatch({ control, name: `items.${index}` });
-  const lineTotal = item ? rowTotal(item) : 0;
 
   return (
     <div key={fieldId}>
@@ -257,11 +255,11 @@ export function QuoteForm({ onSubmit, defaultValues }: QuoteFormProps) {
               key={field.id}
               fieldId={field.id}
               index={index}
-              control={control}
               register={register}
               errors={errors}
               remove={remove}
               isOnly={fields.length === 1}
+              lineTotal={rowTotal(watchedItems[index] ?? {})}
             />
           ))}
         </div>
