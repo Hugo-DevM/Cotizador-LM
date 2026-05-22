@@ -129,10 +129,9 @@ export function QuoteForm({ onSubmit, defaultValues }: QuoteFormProps) {
                       <div className="text-xs text-gray-400 mb-1">Cant.</div>
                       <input
                         {...register(`items.${index}.quantity`)}
-                        type="number"
-                        min="1"
+                        type="text"
+                        inputMode="numeric"
                         placeholder="0"
-                        onWheel={(e) => e.currentTarget.blur()}
                         className={`w-full border rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.quantity ? 'border-red-400' : 'border-gray-300'}`}
                       />
                     </div>
@@ -140,11 +139,9 @@ export function QuoteForm({ onSubmit, defaultValues }: QuoteFormProps) {
                       <div className="text-xs text-gray-400 mb-1">P. Unitario</div>
                       <input
                         {...register(`items.${index}.unitPrice`)}
-                        type="number"
-                        min="0"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
-                        onWheel={(e) => e.currentTarget.blur()}
                         className={`w-full border rounded-lg px-2 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.unitPrice ? 'border-red-400' : 'border-gray-300'}`}
                       />
                     </div>
@@ -167,10 +164,9 @@ export function QuoteForm({ onSubmit, defaultValues }: QuoteFormProps) {
                 <div className="hidden sm:grid sm:grid-cols-[48px_1fr_130px_96px_32px] gap-2 items-start">
                   <input
                     {...register(`items.${index}.quantity`)}
-                    type="number"
-                    min="1"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
-                    onWheel={(e) => e.currentTarget.blur()}
                     className={`w-full border rounded-lg px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.quantity ? 'border-red-400' : 'border-gray-300'}`}
                   />
                   <textarea
@@ -182,11 +178,9 @@ export function QuoteForm({ onSubmit, defaultValues }: QuoteFormProps) {
                   />
                   <input
                     {...register(`items.${index}.unitPrice`)}
-                    type="number"
-                    min="0"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="0.00"
-                    onWheel={(e) => e.currentTarget.blur()}
                     className={`w-full border rounded-lg px-2 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.unitPrice ? 'border-red-400' : 'border-gray-300'}`}
                   />
                   <div className="text-right text-sm font-semibold text-gray-800 pr-1">{mxn(lineTotal)}</div>
