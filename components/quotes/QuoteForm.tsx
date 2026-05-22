@@ -44,15 +44,36 @@ function ItemRow({
   isOnly,
   lineTotal,
 }: ItemRowProps) {
-
   return (
-    <div key={fieldId}>
-      {/* Mobile */}
-      <div className="sm:hidden border border-gray-200 rounded-lg p-3 space-y-2">
+    // Un único grid que reposiciona los elementos según breakpoint.
+    // Mobile (4 cols):  fila 1 = descripción full-width | fila 2 = cant · precio · total · ×
+    // Desktop (5 cols): fila 1 = cant · descripción · precio · total · ×
+    <div
+      key={fieldId}
+      className={[
+        "grid gap-x-2 gap-y-2 items-start",
+        // Mobile: borde de tarjeta
+        "border border-gray-200 rounded-lg p-3",
+        // Mobile: 4 columnas + 2 filas
+        "grid-cols-[56px_1fr_96px_32px]",
+        "[grid-template-areas:'desc_desc_desc_desc'_'qty_price_total_del']",
+        // Desktop: sin borde, 5 columnas + 1 fila
+        "sm:border-0 sm:rounded-none sm:p-0",
+        "sm:grid-cols-[48px_1fr_130px_96px_32px]",
+        "sm:[grid-template-areas:'qty_desc_price_total_del']",
+      ].join(" ")}
+    >
+      {/* Descripción — único textarea, se posiciona distinto en mobile vs desktop */}
+      <div className="[grid-area:desc]">
         <textarea
           {...register(`items.${index}.description`)}
           placeholder="Descripción del producto o servicio"
-          rows={1}
+          rows={2}
+          onInput={(e) => {
+            const el = e.currentTarget;
+            el.style.height = "auto";
+            el.style.height = el.scrollHeight + "px";
+          }}
           className={`resize-none overflow-hidden ${errors.items?.[index]?.description ? INPUT_ERR : INPUT}`}
         />
         {errors.items?.[index]?.description && (
@@ -60,81 +81,49 @@ function ItemRow({
             {errors.items[index]?.description?.message}
           </p>
         )}
-        <div className="flex gap-2 items-center">
-          <div className="w-14">
-            <div className="text-xs text-gray-400 mb-1">Cant.</div>
-            <input
-              {...register(`items.${index}.quantity`)}
-              type="text"
-              inputMode="numeric"
-              placeholder="0"
-              className={`w-full border rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.quantity ? "border-red-400" : "border-gray-300"}`}
-            />
-          </div>
-          <div className="flex-1">
-            <div className="text-xs text-gray-400 mb-1">P. Unitario</div>
-            <input
-              {...register(`items.${index}.unitPrice`)}
-              type="text"
-              inputMode="decimal"
-              placeholder="0.00"
-              className={`w-full border rounded-lg px-2 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.unitPrice ? "border-red-400" : "border-gray-300"}`}
-            />
-          </div>
-          <div className="w-24 text-right">
-            <div className="text-xs text-gray-400 mb-1">Total</div>
-            <div className="font-semibold text-sm py-2">{mxn(lineTotal)}</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => remove(index)}
-            disabled={isOnly}
-            className="mt-4 text-red-400 hover:text-red-600 disabled:opacity-20 text-xl leading-none font-bold"
-          >
-            ×
-          </button>
-        </div>
       </div>
 
-      {/* Desktop */}
-      <div className="hidden sm:grid sm:grid-cols-[48px_1fr_130px_96px_32px] gap-2 items-start">
+      {/* Cantidad */}
+      <div className="[grid-area:qty]">
+        <div className="text-xs text-gray-400 mb-1 sm:hidden">Cant.</div>
         <input
           {...register(`items.${index}.quantity`)}
           type="text"
           inputMode="numeric"
           placeholder="0"
-          className={`w-full border rounded-lg px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.quantity ? "border-red-400" : "border-gray-300"}`}
+          className={`w-full border rounded-lg px-2 py-2 sm:py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.quantity ? "border-red-400" : "border-gray-300"}`}
         />
-        <textarea
-          {...register(`items.${index}.description`)}
-          placeholder="Descripción"
-          rows={1}
-          onInput={(e) => {
-            const el = e.currentTarget;
-            el.style.height = "auto";
-            el.style.height = el.scrollHeight + "px";
-          }}
-          className={`resize-none overflow-hidden w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.description ? "border-red-400" : "border-gray-300"}`}
-        />
+      </div>
+
+      {/* Precio unitario */}
+      <div className="[grid-area:price]">
+        <div className="text-xs text-gray-400 mb-1 sm:hidden">P. Unitario</div>
         <input
           {...register(`items.${index}.unitPrice`)}
           type="text"
           inputMode="decimal"
           placeholder="0.00"
-          className={`w-full border rounded-lg px-2 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.unitPrice ? "border-red-400" : "border-gray-300"}`}
+          className={`w-full border rounded-lg px-2 py-2 sm:py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.unitPrice ? "border-red-400" : "border-gray-300"}`}
         />
-        <div className="text-right text-sm font-semibold text-gray-800 pr-1">
+      </div>
+
+      {/* Total */}
+      <div className="[grid-area:total] text-right">
+        <div className="text-xs text-gray-400 mb-1 sm:hidden">Total</div>
+        <div className="font-semibold text-sm py-2 sm:pr-1 sm:text-gray-800">
           {mxn(lineTotal)}
         </div>
-        <button
-          type="button"
-          onClick={() => remove(index)}
-          disabled={isOnly}
-          className="text-red-400 hover:text-red-600 disabled:opacity-20 text-xl font-bold flex items-center justify-center"
-        >
-          ×
-        </button>
       </div>
+
+      {/* Eliminar */}
+      <button
+        type="button"
+        onClick={() => remove(index)}
+        disabled={isOnly}
+        className="[grid-area:del] self-center text-red-400 hover:text-red-600 disabled:opacity-20 text-xl font-bold flex items-center justify-center"
+      >
+        ×
+      </button>
     </div>
   );
 }
