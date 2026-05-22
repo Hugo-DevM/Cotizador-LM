@@ -1,14 +1,15 @@
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 
 export async function generateQuotePDF(html: string): Promise<Buffer> {
+  const executablePath =
+    process.env.CHROME_EXECUTABLE_PATH ?? (await chromium.executablePath())
+
   const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath,
     headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-    ],
   })
 
   try {
