@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import { QuoteForm } from '@/components/quotes/QuoteForm'
 import { QuoteTemplate } from '@/templates/quote-template'
 import type { QuoteFormValues } from '@/types/quote'
@@ -40,6 +40,31 @@ export function QuotesNewClient() {
   const [nextNumber, setNextNumber] = useState<string>(getNextQuoteNumber)
   const [showWaInput, setShowWaInput] = useState(false)
   const [waPhone, setWaPhone] = useState('')
+
+  // ── Escala del preview para móvil ─────────────────────────────────────────
+  const previewContainerRef = useRef<HTMLDivElement>(null)
+  const previewInnerRef = useRef<HTMLDivElement>(null)
+  const [previewScale, setPreviewScale] = useState(1)
+  const [previewHeight, setPreviewHeight] = useState<number | null>(null)
+  const DOC_WIDTH = 700
+
+  useLayoutEffect(() => {
+    if (view !== 'preview') return
+    const container = previewContainerRef.current
+    const inner = previewInnerRef.current
+    if (!container || !inner) return
+
+    const update = () => {
+      const scale = Math.min(1, container.clientWidth / DOC_WIDTH)
+      setPreviewScale(scale)
+      setPreviewHeight(inner.offsetHeight * scale)
+    }
+
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [view])
 
   const handleFormSubmit = (data: QuoteFormValues) => {
     setFormData(data)
@@ -210,8 +235,22 @@ export function QuotesNewClient() {
 
         {/* Documento */}
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="bg-white shadow-lg p-6 sm:p-8">
-            <QuoteTemplate data={formData} />
+          <div
+            ref={previewContainerRef}
+            className="bg-white shadow-lg overflow-hidden"
+            style={{ height: previewHeight ?? 'auto' }}
+          >
+            <div
+              ref={previewInnerRef}
+              style={{
+                transformOrigin: 'top left',
+                transform: `scale(${previewScale})`,
+                width: `${DOC_WIDTH}px`,
+                padding: '24px',
+              }}
+            >
+              <QuoteTemplate data={formData} />
+            </div>
           </div>
 
           {/* Botón nueva cotización */}
