@@ -24,6 +24,20 @@ const SECTION = "bg-white rounded-xl shadow-sm border border-gray-100 p-5";
 const SECTION_TITLE =
   "text-xs font-semibold text-blue-900 uppercase tracking-wide mb-4";
 
+// ── Filtros de teclado ────────────────────────────────────────────────────
+const PASS_KEYS = ['Backspace','Delete','Tab','Enter','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End']
+
+function blockNonNumeric(e: React.KeyboardEvent<HTMLInputElement>) {
+  if (!/^\d$/.test(e.key) && !PASS_KEYS.includes(e.key) && !(e.ctrlKey || e.metaKey))
+    e.preventDefault()
+}
+
+function blockNonDecimal(e: React.KeyboardEvent<HTMLInputElement>) {
+  const allowDot = e.key === '.' && !e.currentTarget.value.includes('.')
+  if (!/^\d$/.test(e.key) && !allowDot && !PASS_KEYS.includes(e.key) && !(e.ctrlKey || e.metaKey))
+    e.preventDefault()
+}
+
 // ── Fila aislada: su propio useWatch para no re-renderizar las demás filas ──
 interface ItemRowProps {
   index: number;
@@ -91,6 +105,7 @@ function ItemRow({
           type="text"
           inputMode="numeric"
           placeholder="0"
+          onKeyDown={blockNonNumeric}
           className={`w-full border rounded-lg px-2 py-2 sm:py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.quantity ? "border-red-400" : "border-gray-300"}`}
         />
       </div>
@@ -103,6 +118,7 @@ function ItemRow({
           type="text"
           inputMode="decimal"
           placeholder="0.00"
+          onKeyDown={blockNonDecimal}
           className={`w-full border rounded-lg px-2 py-2 sm:py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.items?.[index]?.unitPrice ? "border-red-400" : "border-gray-300"}`}
         />
       </div>
@@ -170,6 +186,8 @@ export function QuoteForm({ onSubmit, defaultValues }: QuoteFormProps) {
             <label className={LABEL}>Número de Cotización</label>
             <input
               {...register("number")}
+              inputMode="numeric"
+              onKeyDown={blockNonNumeric}
               className={errors.number ? INPUT_ERR : INPUT}
             />
             {errors.number && (
