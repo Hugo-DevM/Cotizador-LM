@@ -45,14 +45,14 @@ export function QuoteTemplate({ data }: QuoteTemplateProps) {
                   <p className="text-sm font-bold text-red-700 mb-1">
                     {COMPANY.name}
                   </p>
-                  <p className="text-gray-500">{COMPANY.address}</p>
-                  <p className="text-gray-500">Tel: {COMPANY.phone}</p>
-                  <p className="text-gray-500">{COMPANY.email}</p>
-                  <p className="text-gray-500">{COMPANY.web}</p>
                   <p className="text-gray-500">RFC: {COMPANY.rfc}</p>
                   <p className="text-gray-500">
                     Razon Social: {COMPANY.razonSocial}
                   </p>
+                  <p className="text-gray-500">{COMPANY.address}</p>
+                  <p className="text-gray-500">Tel: {COMPANY.phone}</p>
+                  <p className="text-gray-500">{COMPANY.email}</p>
+                  <p className="text-gray-500">{COMPANY.web}</p>
                 </div>
               </div>
             </td>
