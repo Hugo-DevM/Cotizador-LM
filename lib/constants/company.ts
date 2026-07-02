@@ -9,7 +9,7 @@ export const COMPANY = {
 } as const;
 
 export const TERMS = [
-  "1.- Cotizacion Valida 3 dias habiles.",
+  "1.- Cotizacion Valida 31 dias habiles.",
   "2.- Anticipo del 70% contra entrega 30%.",
   "3.- Entregado el producto o ejecutado el servicio no existen devoluciones.",
 ] as const;

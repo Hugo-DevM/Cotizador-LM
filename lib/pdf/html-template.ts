@@ -1,75 +1,80 @@
-import fs from 'fs'
-import path from 'path'
-import { COMPANY, TERMS } from '@/lib/constants/company'
-import { formatDateMX } from '@/lib/utils/date'
-import { formatMXN } from '@/lib/utils/currency'
-import { calculateTotals } from '@/lib/calculations/totals'
-import type { QuoteSchemaInput } from '@/lib/schemas/quote'
+import fs from "fs";
+import path from "path";
+import { COMPANY, TERMS } from "@/lib/constants/company";
+import { formatDateMX } from "@/lib/utils/date";
+import { formatMXN } from "@/lib/utils/currency";
+import { calculateTotals } from "@/lib/calculations/totals";
+import type { QuoteSchemaInput } from "@/lib/schemas/quote";
 
-let _logoDataUrl: string | null = null
+let _logoDataUrl: string | null = null;
 function getLogoDataUrl(): string {
   if (_logoDataUrl === null) {
     try {
-      const data = fs.readFileSync(path.join(process.cwd(), 'public', 'logolm.jpeg'))
-      _logoDataUrl = `data:image/jpeg;base64,${data.toString('base64')}`
+      const data = fs.readFileSync(
+        path.join(process.cwd(), "public", "logolm.jpeg"),
+      );
+      _logoDataUrl = `data:image/jpeg;base64,${data.toString("base64")}`;
     } catch {
-      _logoDataUrl = ''
+      _logoDataUrl = "";
     }
   }
-  return _logoDataUrl
+  return _logoDataUrl;
 }
 
 const C = {
-  red: '#c00000',
-  redLight: '#ffcccc',
-  border: '#000000',
-  borderSoft: '#cccccc',
-  alt: '#f2f2f2',
-  text: '#1e293b',
-  muted: '#64748b',
-  white: '#ffffff',
-  labelBg: '#dce6f1',
-} as const
+  red: "#c00000",
+  redLight: "#ffcccc",
+  border: "#000000",
+  borderSoft: "#cccccc",
+  alt: "#f2f2f2",
+  text: "#1e293b",
+  muted: "#64748b",
+  white: "#ffffff",
+  labelBg: "#dce6f1",
+} as const;
 
-const cell  = `border:1px solid ${C.border}; padding:4px 8px; font-size:9.5pt;`
-const cellR = `${cell} text-align:right;`
-const soft  = `border:1px solid ${C.borderSoft}; padding:4px 8px; font-size:9.5pt; word-break:break-word; overflow-wrap:break-word;`
-const softR = `${soft} text-align:right;`
-const softC = `${soft} text-align:center;`
-const label = `${cellR} background:${C.labelBg}; font-weight:600;`
+const cell = `border:1px solid ${C.border}; padding:4px 8px; font-size:9.5pt;`;
+const cellR = `${cell} text-align:right;`;
+const soft = `border:1px solid ${C.borderSoft}; padding:4px 8px; font-size:9.5pt; word-break:break-word; overflow-wrap:break-word;`;
+const softR = `${soft} text-align:right;`;
+const softC = `${soft} text-align:center;`;
+const label = `${cellR} background:${C.labelBg}; font-weight:600;`;
 
-const TOTAL_ROWS = 17
+const TOTAL_ROWS = 17;
 
 export function buildQuoteHTML(data: QuoteSchemaInput): string {
-  const logoDataUrl = getLogoDataUrl()
-  const totals = calculateTotals(data.items, data.discount, data.shipping)
+  const logoDataUrl = getLogoDataUrl();
+  const totals = calculateTotals(data.items, data.discount, data.shipping);
 
   const visibleItems = data.items.filter(
-    (it) => it.description.trim() || parseFloat(it.quantity) > 0
-  )
+    (it) => it.description.trim() || parseFloat(it.quantity) > 0,
+  );
 
   // ── 17 filas fijas de productos ──────────────────────────────────────────
   const itemRows = Array.from({ length: TOTAL_ROWS }, (_, i) => {
-    const item = visibleItems[i]
-    const bg = i % 2 === 0 ? C.white : C.alt
+    const item = visibleItems[i];
+    const bg = i % 2 === 0 ? C.white : C.alt;
     if (item) {
-      const total = (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0)
+      const total =
+        (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0);
       return `<tr style="background:${bg};min-height:22px;">
         <td style="${softC}">${item.quantity}</td>
         <td style="${soft}">${item.description}</td>
         <td style="${softR}">$${formatMXN(parseFloat(item.unitPrice) || 0)}</td>
         <td style="${softR}">$${formatMXN(total)}</td>
-      </tr>`
+      </tr>`;
     }
     return `<tr style="background:${bg};min-height:22px;">
       <td style="${softC}">&nbsp;</td>
       <td style="${soft}">&nbsp;</td>
       <td style="${softR}">&nbsp;</td>
       <td style="${softR}">&nbsp;</td>
-    </tr>`
-  }).join('')
+    </tr>`;
+  }).join("");
 
-  const termsHTML = TERMS.map((t) => `<div style="margin-bottom:3px;">${t}</div>`).join('')
+  const termsHTML = TERMS.map(
+    (t) => `<div style="margin-bottom:3px;">${t}</div>`,
+  ).join("");
 
   return `<!DOCTYPE html>
 <html lang="es">
@@ -92,17 +97,20 @@ export function buildQuoteHTML(data: QuoteSchemaInput): string {
       <table style="border-collapse:collapse;width:100%;">
         <tr>
           <td style="width:90px;vertical-align:top;padding-right:10px;">
-            ${logoDataUrl
-              ? `<img src="${logoDataUrl}" alt="Logo" style="width:85px;height:85px;object-fit:contain;display:block;"/>`
-              : `<div style="width:85px;height:85px;border:2px dashed #aaa;border-radius:4px;background:#f9f9f9;"></div>`
+            ${
+              logoDataUrl
+                ? `<img src="${logoDataUrl}" alt="Logo" style="width:85px;height:85px;object-fit:contain;display:block;"/>`
+                : `<div style="width:85px;height:85px;border:2px dashed #aaa;border-radius:4px;background:#f9f9f9;"></div>`
             }
           </td>
           <td style="vertical-align:middle;">
             <div style="font-weight:700;font-size:13pt;margin-bottom:3px;color:${C.red};">${COMPANY.name}</div>
+            <div style="font-size:8.5pt;color:${C.muted};margin-bottom:2px;">RFC: ${COMPANY.rfc}</div>
+            <div style="font-size:8.5pt;color:${C.muted};">${COMPANY.razonSocial}</div>
             <div style="font-size:8.5pt;color:${C.muted};margin-bottom:2px;">${COMPANY.address}</div>
             <div style="font-size:8.5pt;color:${C.muted};margin-bottom:2px;">Tel: ${COMPANY.phone}</div>
             <div style="font-size:8.5pt;color:${C.muted};margin-bottom:2px;">${COMPANY.email}</div>
-            <div style="font-size:8.5pt;color:${C.muted};">${COMPANY.web}</div>
+            <div style="font-size:8.5pt;color:${C.muted};margin-bottom:2px;">${COMPANY.web}</div>
           </td>
         </tr>
       </table>
@@ -128,11 +136,11 @@ export function buildQuoteHTML(data: QuoteSchemaInput): string {
   <tr>
     <td style="${cell} width:40%;vertical-align:top;padding:6px 8px;">
       <div style="font-size:7.5pt;font-weight:700;color:${C.muted};margin-bottom:2px;letter-spacing:.5px;">CLIENTE</div>
-      <div style="font-weight:700;font-size:10.5pt;">${data.clientName || '—'}</div>
+      <div style="font-weight:700;font-size:10.5pt;">${data.clientName || "—"}</div>
     </td>
     <td style="${cell} vertical-align:top;padding:6px 8px;">
       <div style="font-size:7.5pt;font-weight:700;color:${C.muted};margin-bottom:2px;letter-spacing:.5px;">EMPRESA</div>
-      <div style="font-weight:700;font-size:10.5pt;">${data.companyName || '—'}</div>
+      <div style="font-weight:700;font-size:10.5pt;">${data.companyName || "—"}</div>
     </td>
   </tr>
 </table>
@@ -203,5 +211,5 @@ export function buildQuoteHTML(data: QuoteSchemaInput): string {
 </table>
 
 </body>
-</html>`
+</html>`;
 }
